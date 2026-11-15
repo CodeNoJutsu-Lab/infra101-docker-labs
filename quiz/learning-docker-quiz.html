@@ -1,0 +1,526 @@
+<!doctype html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Learning Docker – Quiz</title>
+    <style>
+      :root {
+        --bg: #f3f6fa;
+        --surface: #ffffff;
+        --text: #14202e;
+        --muted: #5a6b7d;
+        --line: #d5dde7;
+        --accent: #0b5fd1;
+        --accent-ink: #ffffff;
+        --ok: #14733a;
+        --ok-bg: #e3f4e9;
+        --ko: #b3261e;
+        --ko-bg: #fbe7e5;
+        --code-bg: #eaf0f7;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root:not([data-theme="light"]) {
+          --bg: #0e1621;
+          --surface: #16212f;
+          --text: #e6edf5;
+          --muted: #9bacbf;
+          --line: #2a3a4d;
+          --accent: #5aa2ff;
+          --accent-ink: #06131f;
+          --ok: #6fd195;
+          --ok-bg: #12301f;
+          --ko: #ff8f87;
+          --ko-bg: #3a1917;
+          --code-bg: #0f1a27;
+          color-scheme: dark;
+        }
+      }
+      * {
+        box-sizing: border-box;
+      }
+      html {
+        font-size: 17px;
+      }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          "Segoe UI",
+          system-ui,
+          -apple-system,
+          Roboto,
+          sans-serif;
+        line-height: 1.55;
+      }
+      main {
+        max-width: 46rem;
+        margin: 0 auto;
+        padding: 1.5rem 1rem 4rem;
+      }
+      h1 {
+        font-size: 1.35rem;
+        margin: 0 0 0.25rem;
+        letter-spacing: -0.01em;
+      }
+      .sub {
+        color: var(--muted);
+        margin: 0 0 1.25rem;
+        font-size: 0.9rem;
+      }
+      .bar {
+        height: 6px;
+        background: var(--line);
+        border-radius: 3px;
+        overflow: hidden;
+        margin-bottom: 0.4rem;
+      }
+      .bar > div {
+        height: 100%;
+        background: var(--accent);
+        width: 0;
+        transition: width 0.3s;
+      }
+      .meta {
+        display: flex;
+        justify-content: space-between;
+        color: var(--muted);
+        font-size: 0.85rem;
+        margin-bottom: 1rem;
+      }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 10px;
+        padding: 1.25rem;
+      }
+      .q {
+        font-size: 1.05rem;
+        font-weight: 600;
+        margin: 0 0 1rem;
+        white-space: pre-line;
+      }
+      pre {
+        background: var(--code-bg);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 0.75rem 0.9rem;
+        overflow-x: auto;
+        font:
+          0.82rem/1.5 ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        margin: 0 0 1rem;
+      }
+      code {
+        background: var(--code-bg);
+        padding: 0.05em 0.3em;
+        border-radius: 4px;
+        font:
+          0.88em ui-monospace,
+          Menlo,
+          Consolas,
+          monospace;
+        overflow-wrap: anywhere;
+      }
+      .opts {
+        display: grid;
+        gap: 0.55rem;
+      }
+      .opt {
+        display: block;
+        width: 100%;
+        text-align: left;
+        font: inherit;
+        color: inherit;
+        background: var(--surface);
+        border: 1.5px solid var(--line);
+        border-radius: 8px;
+        padding: 0.7rem 0.9rem;
+        cursor: pointer;
+      }
+      .opt:hover:not(:disabled) {
+        border-color: var(--accent);
+      }
+      .opt:focus-visible,
+      .btn:focus-visible {
+        outline: 3px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .opt:disabled {
+        cursor: default;
+      }
+      .opt.ok {
+        border-color: var(--ok);
+        background: var(--ok-bg);
+      }
+      .opt.ko {
+        border-color: var(--ko);
+        background: var(--ko-bg);
+      }
+      .fb {
+        margin-top: 1rem;
+        padding: 0.8rem 0.9rem;
+        border-radius: 8px;
+        font-size: 0.93rem;
+      }
+      .fb.ok {
+        background: var(--ok-bg);
+        color: var(--text);
+        border-left: 4px solid var(--ok);
+      }
+      .fb.ko {
+        background: var(--ko-bg);
+        color: var(--text);
+        border-left: 4px solid var(--ko);
+      }
+      .fb b {
+        display: block;
+        margin-bottom: 0.15rem;
+      }
+      .actions {
+        margin-top: 1.1rem;
+        display: flex;
+        justify-content: flex-end;
+        gap: 0.6rem;
+      }
+      .btn {
+        font: inherit;
+        font-weight: 600;
+        background: var(--accent);
+        color: var(--accent-ink);
+        border: 0;
+        border-radius: 8px;
+        padding: 0.65rem 1.2rem;
+        cursor: pointer;
+      }
+      .btn.alt {
+        background: transparent;
+        color: var(--accent);
+        border: 1.5px solid var(--accent);
+      }
+      .score {
+        font-size: 2.6rem;
+        font-weight: 700;
+        margin: 0.2rem 0;
+      }
+      .rev {
+        margin: 1rem 0 0;
+        padding: 0;
+        list-style: none;
+        display: grid;
+        gap: 0.4rem;
+        font-size: 0.9rem;
+      }
+      .rev li {
+        display: flex;
+        gap: 0.6rem;
+        align-items: baseline;
+      }
+      .rev .tag {
+        flex: none;
+        width: 1.4rem;
+        font-weight: 700;
+      }
+      .rev .ok .tag {
+        color: var(--ok);
+      }
+      .rev .ko .tag {
+        color: var(--ko);
+      }
+      [hidden] {
+        display: none !important;
+      }
+      @media (prefers-reduced-motion: reduce) {
+        .bar > div {
+          transition: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <h1>Learning Docker</h1>
+      <p class="sub">Quiz de fin de chapitre · 14 questions</p>
+      <div class="bar"><div id="bar"></div></div>
+      <div class="meta"><span id="pos"></span><span id="sc"></span></div>
+      <section class="card" id="quiz" aria-live="polite"></section>
+    </main>
+
+    <script>
+      const QUESTIONS = [
+        {
+          q: "You have upgraded your application to a new version, 1.0.1, and created an image for it called my-app. You successfully pushed the image with docker push.\nUpon logging into Docker Hub, you notice that 1.0.1 is not there but 1.0.0 is.\nWhat is the most likely cause for this happening?",
+          o: [
+            "You were temporarily offline while pushing 1.0.1 to Docker Hub.",
+            "Docker Hub only allows you to store one tag per image at a time.",
+            "You ran `docker push $DOCKER_HUB_USERNAME/my-app:1.0.0` and forgot to run `docker push $DOCKER_HUB_USERNAME/my-app:1.0.1`.",
+          ],
+          a: 2,
+          e: "Chaque tag doit être poussé séparément : seul le tag 1.0.0 a été envoyé.",
+        },
+        {
+          q: "You have upgraded your application to a new version, 1.0.1, and created an image for it called my-app. Which of these commands should you run to make it easy for others to find on the Docker Hub?",
+          o: [
+            "`docker tag my-app $DOCKER_HUB_USERNAME/my-app:latest`",
+            "`docker tag my-app $DOCKER_HUB_USERNAME/my-app:v1.0.1`",
+            "`docker tag my-app my-app:latest`",
+            "`docker tag my-app my-app:v1.0.1`",
+          ],
+          a: 1,
+          e: "Pour être trouvée sur Docker Hub, l'image doit être préfixée par votre nom d'utilisateur, avec un tag de version explicite.",
+        },
+        {
+          q: "Select the least true statement from the list.",
+          o: [
+            "Docker Hub is the default container registry used by the Docker client.",
+            "By default, Docker images will receive a latest version tag if a version tag is not provided.",
+            "Anyone can push to Docker Hub. You do not need to register an account.",
+            "Anyone can pull from the Docker Hub without an account.",
+          ],
+          a: 2,
+          e: "Pousser une image exige un compte Docker Hub. Le téléchargement (pull) d'images publiques, lui, n'en demande pas.",
+        },
+        {
+          q: "Why would you want to mount a directory to your container?",
+          o: [
+            "Because containers do not save data after they are deleted.",
+            "So that your container can access the Internet using the host's network sockets.",
+            "To improve disk IO performance.",
+            "So that the container can create directories.",
+          ],
+          a: 0,
+          e: "Les données d'un conteneur disparaissent avec lui. Un répertoire monté les conserve sur l'hôte.",
+        },
+        {
+          q: "You have just installed Docker to begin moving an application that your team supports into containers. You tried running a CLI command but were shown text similar to the below:",
+          code: "docker [COMMAND]\" requires at least 1 argument.\nSee 'docker [COMMAND] --help'.\n\nUsage: docker [COMMAND] [OPTIONS] [ARG...]",
+          q2: "What is the most likely cause for this happening?",
+          o: [
+            "You forgot to provide additional options or arguments to the command. Run `--help` to find out what you missed.",
+            "You forgot to provide a subcommand. Run `--help` to see what you missed.",
+            "The CLI is not configured properly. Edit `/etc/docker/docker.json` to fix.",
+            "The CLI command is missing a plugin. Visit docker.com to learn how to install it.",
+          ],
+          a: 0,
+          e: "Les commandes qui exigent des options ou arguments affichent une aide abrégée quand il en manque. Lancez `--help` pour voir lesquels.",
+        },
+        {
+          q: "Which of these three commands is `docker run` a combination of?",
+          o: [
+            "`docker container create` + `docker container start` + `docker container inspect`",
+            "`docker container create` + `docker container start` + `docker ps`",
+            "`docker container create` + `docker container start` + `docker container attach`",
+            "`docker container create` + `docker ps` + `docker container attach`",
+          ],
+          a: 2,
+          e: "`docker run` crée le conteneur, le démarre, puis s'y attache.",
+        },
+        {
+          q: "Which of these statements about `docker container start` is true?",
+          o: [
+            "You must run `docker rm` before running `docker container start`.",
+            "You can run `docker container start` against a container multiple times.",
+            "You can only run `docker container start` against a container once. To re-run, delete the container first.",
+            "You must run `docker run` before running `docker container start`.",
+          ],
+          a: 1,
+          e: "Un conteneur arrêté peut être redémarré autant de fois que nécessaire.",
+        },
+        {
+          q: "You are helping a colleague learn Docker. They said that they created a Docker container from the nginx Docker image, but it does not show up after running `docker ps`.\nThey confirmed that they could successfully pull the nginx image from Docker Hub.\nWhat is the most likely cause and solution for this problem?",
+          o: [
+            "They created the container with `docker container create` but forgot to start it. Run `docker container start` to fix.",
+            "The entrypoint for the nginx image they pulled is incorrect. Use dfimage to recreate and save its Dockerfile, change the entrypoint, and build a new image locally.",
+            "They need to run `docker pull` to pull the nginx image first before running `docker container create`.",
+            "They provided the wrong image to `docker container create`. Fix the image, then try again.",
+          ],
+          a: 0,
+          e: "`docker container create` crée le conteneur sans le démarrer. Il faut `docker container start` pour exécuter l'entrypoint de l'image.",
+        },
+        {
+          q: "You are debugging a broken Jenkins pipeline that deploys your application into production. It creates Docker containers during the testing stage of the pipeline.\nYou see this error message in the logs for the last build:",
+          code: "$: docker run --rm my-app:v7.2.1\nUnable to find image 'my-app:7.2.1' locally\ndocker: Error response from daemon: manifest for my-app:7.2.1 not found: manifest unknown: manifest unknown.\nSee 'docker run --help'.",
+          q2: "What is the most likely cause for this error?",
+          o: [
+            "The Jenkins runner node does not have enough disk space to pull new Docker images.",
+            "Docker was not able to find a container image named `my-app:7.2.1` in Docker Hub or your private registry.",
+            "The test stage forgot to run `docker container create` before executing `docker run`.",
+            "Docker was not fully installed on this Jenkins node.",
+          ],
+          a: 1,
+          e: "`docker run` tente d'abord de télécharger l'image depuis Docker Hub ou votre registre privé. Cette erreur apparaît quand l'image reste introuvable.",
+        },
+        {
+          q: "What is the most correct explanation describing this command:",
+          code: "docker exec -i -t 2bf bash",
+          q2: "(Don't forget to use docker exec --help if you need it!)",
+          o: [
+            "This starts an interactive Bash shell within a container with ID 2bf with a pseudo-TTY allocated to it.",
+            "This starts a Bash shell within a container starting with ID 2bf with a pseudo-TTY allocated to it.",
+            "This starts an interactive Bash shell within a container starting with ID 2bf.",
+            "This starts an interactive Bash shell within a container starting with ID 2bf with a pseudo-TTY allocated to it.",
+          ],
+          a: 3,
+          e: "`-i` signifie `--interactive` et `-t` signifie `--tty`. Docker accepte aussi un préfixe d'ID (ici « 2bf »).",
+        },
+        {
+          q: "You started a container that ran a single command. That container has now exited. You would like to get the ID of this container for additional reporting.\nWhich of these commands will successfully complete this task?",
+          o: [
+            "`docker ps`",
+            "`docker inspect`",
+            "`docker logs`",
+            "`docker ps -a`",
+          ],
+          a: 3,
+          e: "`docker ps` n'affiche que les conteneurs en cours d'exécution. Ajoutez `-a` (`--all`) pour voir tous les conteneurs.",
+        },
+        {
+          q: "You are creating a Dockerfile for your web application that will be pushed into your company's private Docker registry. Your application is a NodeJS-based to-do list for keeping track of your team's Objectives and Key Results, or OKRs. Your Dockerfile uses express as its webserver.\nYour terminal hangs while trying to start a container from this image. You can't seem to exit it, no matter how many keystrokes you provide.\nThe application does not hang when you run it normally on your computer.\nWhat is the most likely cause for this happening?",
+          o: [
+            "This is a known bug in the express web server. Switch to nginx as your base image.",
+            "You ran `docker run` without providing the `--interactive` option and cannot stop the web server hosting your web app.",
+            "You have an infinite loop in your application somewhere that only happens when it is run within a Docker container.",
+            "You forgot to run `docker container start` after running `docker container create`.",
+          ],
+          a: 1,
+          e: "Pour transmettre des frappes au conteneur, il faut `--interactive`. Sans cela, il ne réagit pas aux touches (Ctrl+C compris).",
+        },
+        {
+          q: "When would you want to bind a port on your computer to that of a container?",
+          o: [
+            "When you want to save data from your container.",
+            "When your container is running a network service that you want to use from your computer.",
+            "When your container needs access to the Internet.",
+            "When your container is running a network service that you want to use from within the container.",
+          ],
+          a: 1,
+          e: "La liaison de port (`-p`) rend un service du conteneur accessible depuis l'hôte.",
+        },
+        {
+          q: "You are trying to remove 20 stopped containers with `docker ps -aq | xargs docker rm`. However, upon doing this, you receive the error below:",
+          code: "Error response from daemon: You cannot remove a running container 8dee53d9631c88d1bc431cffa562355f97c44e6120401a4a01c15def989e319b. Stop the container before attempting removal or force remove",
+          q2: "Which of these commands fixes this problem most efficiently?",
+          o: [
+            "`docker system restart && docker ps -aq | xargs docker rm`",
+            "`docker container create --name 8dee53d9631c...e319b our-server && docker rm 8dee`",
+            "`for i in $(docker ps -aq); do docker rm -f $i; done`",
+            "`docker ps -aq | xargs docker rm -f`",
+          ],
+          a: 3,
+          e: "`-f` force la suppression, même des conteneurs en cours d'exécution, en une seule commande. La boucle `for` fonctionne aussi, mais lance `docker rm` une fois par conteneur.",
+        },
+      ];
+
+      const $ = (id) => document.getElementById(id);
+      const esc = (s) =>
+        s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+      const fmt = (s) => esc(s).replace(/`([^`]+)`/g, "<code>$1</code>");
+
+      let i = 0,
+        score = 0,
+        answers = [];
+
+      function render() {
+        const Q = QUESTIONS[i],
+          n = QUESTIONS.length;
+        $("bar").style.width = (i / n) * 100 + "%";
+        $("pos").textContent = "Question " + (i + 1) + " sur " + n;
+        $("sc").textContent = "Score : " + score;
+        let h = '<p class="q">' + fmt(Q.q) + "</p>";
+        if (Q.code) h += "<pre>" + esc(Q.code) + "</pre>";
+        if (Q.q2) h += '<p class="q">' + fmt(Q.q2) + "</p>";
+        h += '<div class="opts" role="group" aria-label="Réponses">';
+        Q.o.forEach((t, k) => {
+          h += '<button class="opt" data-k="' + k + '">' + fmt(t) + "</button>";
+        });
+        h +=
+          '</div><div id="fb"></div><div class="actions" id="act" hidden><button class="btn" id="next">' +
+          (i === n - 1 ? "Voir le résultat" : "Question suivante") +
+          "</button></div>";
+        $("quiz").innerHTML = h;
+        document
+          .querySelectorAll(".opt")
+          .forEach((b) =>
+            b.addEventListener("click", () => answer(+b.dataset.k)),
+          );
+        $("next").addEventListener("click", () => {
+          i++;
+          i < n ? render() : finish();
+        });
+      }
+
+      function answer(k) {
+        const Q = QUESTIONS[i],
+          good = k === Q.a;
+        if (good) score++;
+        answers.push(good);
+        document.querySelectorAll(".opt").forEach((b, idx) => {
+          b.disabled = true;
+          if (idx === Q.a) b.classList.add("ok");
+          else if (idx === k) b.classList.add("ko");
+        });
+        $("fb").innerHTML =
+          '<div class="fb ' +
+          (good ? "ok" : "ko") +
+          '"><b>' +
+          (good ? "Bonne réponse." : "Pas tout à fait.") +
+          "</b>" +
+          fmt(Q.e) +
+          "</div>";
+        $("sc").textContent = "Score : " + score;
+        $("act").hidden = false;
+        $("next").focus();
+      }
+
+      function finish() {
+        const n = QUESTIONS.length;
+        $("bar").style.width = "100%";
+        $("pos").textContent = "Terminé";
+        let h =
+          '<h2 style="margin:0">Résultat</h2><div class="score">' +
+          score +
+          " / " +
+          n +
+          "</div>" +
+          '<p style="margin:0;color:var(--muted)">Vous avez répondu correctement à ' +
+          score +
+          " question" +
+          (score > 1 ? "s" : "") +
+          " sur " +
+          n +
+          ".</p>" +
+          '<ul class="rev">';
+        QUESTIONS.forEach((Q, k) => {
+          h +=
+            '<li class="' +
+            (answers[k] ? "ok" : "ko") +
+            '"><span class="tag">' +
+            (answers[k] ? "✓" : "✗") +
+            "</span><span>" +
+            (k + 1) +
+            ". " +
+            fmt(
+              Q.q.split("\n")[0].slice(0, 110) +
+                (Q.q.split("\n")[0].length > 110 ? "…" : ""),
+            ) +
+            "</span></li>";
+        });
+        h +=
+          '</ul><div class="actions"><button class="btn alt" id="retry">Refaire le quiz</button></div>';
+        $("quiz").innerHTML = h;
+        $("retry").addEventListener("click", () => {
+          i = 0;
+          score = 0;
+          answers = [];
+          render();
+        });
+      }
+
+      render();
+    </script>
+  </body>
+</html>
